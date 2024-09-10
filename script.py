@@ -9,20 +9,21 @@ from sklearn.metrics import (
 )
 from datetime import datetime
 from pandas import read_json
-from os import makedirs
+import os
 
 
 class ModelEvaluation:
-    filepath = f'E:\\Python\\test_doskutech\\plots\\{datetime.now().strftime("%Y-%m-%d %H-%M-%S.%f")}'
+    filepath = os.path.join('plots', datetime.now().strftime("%Y-%m-%d %H-%M-%S.%f"))
+    # filepath = f'E:\\Python\\test_doskutech\\plots\\{datetime.now().strftime("%Y-%m-%d %H-%M-%S.%f")}'
 
     def __init__(self) -> None:
         self.data = read_json(
             "https://ai-process-sandy.s3.eu-west-1.amazonaws.com/purge/deviation.json"
         )
-        makedirs(self.filepath)
+        os.makedirs(self.filepath)
 
     def save_plots(self, filename, figure):
-        filepath_plot = f"{self.filepath}\\{filename}.png"
+        filepath_plot = os.path.join(self.filepath, filename)
         figure.savefig(filepath_plot)
 
     def draw_bars(self):
@@ -66,7 +67,7 @@ class ModelEvaluation:
 
         fig, ax = plt.subplots(figsize=(20, 6))
         plt.plot(x, self.data["rb_corners"], linewidth=2, label="Truth")
-        plt.plot(x, self.data["gt_corners"] - 1, linewidth=2.0, label="Predicted")
+        plt.plot(x, self.data["gt_corners"], linewidth=2.0, label="Predicted")
 
         plt.legend()
 
@@ -106,9 +107,9 @@ class ModelEvaluation:
         return figure
 
     def draw_plots(self):
-        self.save_plots("sample-bars", self.draw_bars())
-        self.save_plots("comparison-plots", self.draw_subplots())
-        self.save_plots("evaluation-metrics", self.draw_evaluations())
+        self.save_plots("sample-bars.png", self.draw_bars())
+        self.save_plots("comparison-plots.png", self.draw_subplots())
+        self.save_plots("evaluation-metrics.png", self.draw_evaluations())
 
         return self.filepath
 
